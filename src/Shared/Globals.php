@@ -19,7 +19,7 @@ class Globals
         }
     }
 
-    public function success(string $message = 'success', array $data = null) : JsonResponse
+    public function success(array $data = null, string $message = 'success') : JsonResponse
     {
         return new JsonResponse([
             'status' => 1,
@@ -28,11 +28,11 @@ class Globals
         ], status:200);
     }
 
-    public function error(string $message = 'error', int $codeHttp = 500) : JsonResponse
+    public function error(array $errorHttp = ErrorHttp::ERROR) : JsonResponse
     {
         return new JsonResponse([
             'status' => 0,
-            'message' => $message,
-        ], $codeHttp);
+            'message' => $errorHttp['message'] ?? 'error',
+        ], status: $errorHttp['code'] ?? 500);
     }
 }

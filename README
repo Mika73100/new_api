@@ -6,8 +6,8 @@
 
 - cree une entitée = symfony console make:entity 
 
-                   ->>>> crée en premier les table SANS relation,
-                   ->>>> crée les tables avec les relations
+                ->>>> crée en premier les table SANS relation,
+                ->>>> crée les tables avec les relations
 
 - mettre a jour le schema de la BDD = symfony console doctrine:schema:update --force
 
@@ -136,6 +136,9 @@ ________________________________________________________________________________
             'firstname' => $this->firstname,
             'lastname' => $this->naissance ? $this->naissance->format( format:'c'):null,
             'roles' => $this->roles
+
+            'active' => $this->active,
+            'date_save' => $this->date_save ? $this->date_save->format(format: 'c') : null
         ];
     }
 
@@ -159,6 +162,15 @@ ________________________________________________________________________________
             'message' => $message,
         ], $codeHttp);
     }
+
+
+
+    JE CREE UNE CLASS POUR AFFICHER LES MESSAGES D ERREUR :
+
+    class ErrorHttp
+    
+        public const ERROR = ['message' => 'ERROR', 'code' => 500];
+        public const FROM_INVALID = ['message' => 'FORM_INVALID', 'code' => 400];
 
 
 ____________________________________________________________________________________________________

@@ -4,14 +4,15 @@
 namespace App\Controller\Api;
 
 use App\Entity\TUser;
+use App\Shared\Globals;
+use App\Shared\ErrorHttp;
 use App\Repository\TPaysRepository;
 use App\Repository\TUserRepository;
-use App\Shared\Globals;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SecurityController extends AbstractController
 {
@@ -39,13 +40,12 @@ class SecurityController extends AbstractController
             $data->password,
             ))
 
-        return new JsonResponse( data: 'form invalid', status: 500);
+        return $this->globals->error( errorHttp: ErrorHttp::ERROR);
 
         $user = $this->userRepo->findOneBy(['username' => $data->username]);
 
         //je verifie si USER existe:
-        if (!$user)
-            return new JsonResponse( data: 'username not found', status: 500);
+        if (!$user) $this->globals->error( errorHttp: ErrorHttp::USERNAME_EXIST);
 
         //je verifie si le password et juste:
         // if (!$passwordhasher -> verify($user->getPassword(), $data->password)) 
@@ -75,18 +75,20 @@ class SecurityController extends AbstractController
             ))
         
         //ici l erreur evoque les champs du formulaire ne sont pas tous remplis.
-        return new JsonResponse( data: 'error', status: 500);
+        return $this->globals->error( errorHttp: ErrorHttp::FROM_INVALID);
 
         //ici l erreur si l username n est déjà enregistrer
         if($this->userRepo->findOneBy(['username' => $data->username]) != null)
-        return $this->globals->error( message: 'username already exist');
+        return $this->globals->error( errorHttp: ErrorHttp::USERNAME_EXIST);
 
         //ici l erreur si le mots de passe a moin de 4caractères.
         if(strlen($data->password) < 4)
-        return $this->globals->error( message: 'password too short');
-
-
+        return $this->globals->error( errorHttp: ErrorHttp::PASSWORD_TOO_SHORT);
+        
+        //ici je verifie que le pays existe bien
         $fk_pays = $this->paysRepo->findOneBy(['id' => $data->fk_pays, 'active' => true]);
+        if (!$fk_pays) return $this->globals->error( errorHttp: ErrorHttp::PAYS_NOT_FOUND);
+
         $user = (new TUser())
             ->setActive( active: true )
             ->setUsername( $data -> username )
