@@ -12,10 +12,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+
 #[ORM\Entity(repositoryClass: TUserRepository::class)]
 #[UniqueEntity(fields:"username", message:"username already used")]
 
-class TUser 
+class TUser
 {
     use TraitEntity;
     
@@ -218,6 +219,9 @@ class TUser
         return $this;
     }
 
+    /**
+     * @Param PasswordAuthenticatedUserInterface
+     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -240,6 +244,41 @@ class TUser
         $this->roles = $roles;
 
         return $this;
+    }
+
+    // public function getUserIdentifier(): string
+    // {
+    //     return (string) $this->username;
+    // }
+
+    // public function getSalt(): ?string
+    // {
+    //     return null;
+    // }
+
+    // /**
+    //  * @param UserInterface
+    //  */
+    // public function eraseCredentials()
+    // {
+    //     //if you store and temporary, sensitive data on the user,clear it here
+    //     //$this->plainPassword = null;
+    // }
+
+    //////////////////////ici je crée une nouvelle fonction dans l'entité /////////////////
+    ///qui va me permettre de voir ce qu'a été envoyer dans la BDD sous forme de json//////
+    public function tojson(): array
+    {
+        return [
+            'id' => $this->id,
+            'username' => $this->username,
+            'firstname' => $this->firstname,
+            'lastname' => $this->naissance ? $this->naissance->format( format:'c'):null,
+            'roles' => $this->roles,
+                        
+            'active' => $this->active,
+            'date_save' => $this->date_save ? $this->date_save->format(format: 'c') : null
+        ];
     }
 
 }

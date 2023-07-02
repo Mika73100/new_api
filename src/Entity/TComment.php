@@ -65,4 +65,20 @@ class TComment
 
         return $this;
     }
+
+    //////////////////////ici je crée une nouvelle fonction dans l'entité /////////////////
+    ///qui va me permettre de voir ce qu'a été envoyer dans la BDD sous forme de json//////
+    public function tojson(): array
+    {
+        return [
+            'id' => $this->id,
+            'comment' => $this->comment,
+            'fk_user' => $this->fk_user ? $this->fk_user->tojson() : null,
+            'fk_article' => $this->fk_article ? $this->fk_article->tojson() : null,
+
+                        
+            'active' => $this->active,
+            'date_save' => $this->date_save ? $this->date_save->format(format: 'c') : null
+        ];
+    }
 }

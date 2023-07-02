@@ -125,4 +125,22 @@ class TArticle
     }
 
 
+    //////////////////////ici je crée une nouvelle fonction dans l'entité /////////////////
+    ///qui va me permettre de voir ce qu'a été envoyer dans la BDD sous forme de json//////
+    public function tojson(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'fk_user' => $this->fk_user ? $this->fk_user->tojson() : null,
+            'fk_categories' => $this->fk_categories ? $this->fk_categories->tojson() : null,
+
+            'active' => $this->active,
+            'date_save' => $this->date_save ? $this->date_save->format(format: 'c') : null
+        ];
+    }
+
+
+
 }

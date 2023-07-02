@@ -47,4 +47,16 @@ class TCourrier
 
         return $this;
     }
+
+
+    //////////////////////ici je crée une nouvelle fonction dans l'entité /////////////////
+    ///qui va me permettre de voir ce qu'a été envoyer dans la BDD sous forme de json//////
+    public function tojson(): array
+    {
+        return [
+            'id' => $this->id,
+            'message' => $this->message,
+            'fk_User' => $this->fk_User ? $this->fk_User->tojson() : null,
+        ];
+    }
 }

@@ -5,6 +5,7 @@
 namespace App\Shared;
 
 use PHPUnit\Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class Globals
 {
@@ -16,5 +17,22 @@ class Globals
         } catch (Exception $e){
             return [];
         }
+    }
+
+    public function success(string $message = 'success', array $data = null) : JsonResponse
+    {
+        return new JsonResponse([
+            'status' => 1,
+            'message' => $message,
+            'data' => $data
+        ], status:200);
+    }
+
+    public function error(string $message = 'error', int $codeHttp = 500) : JsonResponse
+    {
+        return new JsonResponse([
+            'status' => 0,
+            'message' => $message,
+        ], $codeHttp);
     }
 }

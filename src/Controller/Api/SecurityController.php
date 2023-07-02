@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class SecurityController extends AbstractController
 {
@@ -27,8 +27,10 @@ class SecurityController extends AbstractController
     }
 
     /////////////ici je cree la route pour le login///////////
+    /**
+    *   @param PasswordHasherInterface $passwordhasher
+    */
     #[Route('/api/login', name: 'api_login', methods:["POST", "GET"])]
-
     public function login(): JsonResponse
     {
         $data = $this->globals->jsondecode();
@@ -46,7 +48,7 @@ class SecurityController extends AbstractController
             return new JsonResponse( data: 'username not found', status: 500);
 
         //je verifie si le password et juste:
-        // if (!$user) 
+        // if (!$passwordhasher -> verify($user->getPassword(), $data->password)) 
         //     return new JsonResponse( data: 'password invalid', status: 500);
         
         return new JsonResponse([
@@ -57,8 +59,10 @@ class SecurityController extends AbstractController
 
 
     /////////////ici je cree la route pour le register///////////
+    /**
+    *   @param PasswordHasherInterface $passwordhasher
+    */
     #[Route('/api/register', name: 'api_register', methods:["POST", "GET"])]
-
     public function register(EntityManagerInterface $entityManager): JsonResponse
     {
         $data = $this->globals->jsondecode();
@@ -69,8 +73,17 @@ class SecurityController extends AbstractController
             $data->password,
             $data->fk_pays
             ))
-
+        
+        //ici l erreur evoque les champs du formulaire ne sont pas tous remplis.
         return new JsonResponse( data: 'error', status: 500);
+
+        //ici l erreur si l username n est déjà enregistrer
+        if($this->userRepo->findOneBy(['username' => $data->username]) != null)
+        return $this->globals->error( message: 'username already exist');
+
+        //ici l erreur si le mots de passe a moin de 4caractères.
+        if(strlen($data->password) < 4)
+        return $this->globals->error( message: 'password too short');
 
 
         $fk_pays = $this->paysRepo->findOneBy(['id' => $data->fk_pays, 'active' => true]);
@@ -82,11 +95,10 @@ class SecurityController extends AbstractController
             ->setFkPays( $fk_pays );
             //->setDateSave( new \DateTime());
             
-        $user->setPassword($data->password);
 
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return new JsonResponse( data: 'register succesfull !');
+        return $this->globals->success( message: 'register done !', data: $user->tojson());
     }
 }

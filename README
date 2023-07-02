@@ -36,7 +36,6 @@ ________________________________________________________________________________
                 }
             }
 
-
 ________________________________________________________________________________
 
 installation du bundle TOKEN sur le projet : 
@@ -120,8 +119,49 @@ REGISTER:
         return new JsonResponse( data: 'register succesfull !');
     }
 
+____________________________________________________________________________________________________
+
+        FORMATAGE DES REPONSE REST & GESTION D ERREURS GLOBALES
+
+
+    //////////////////ici je crée une nouvelle fonction dans l'entité ///////////////////
+    ///qui va me permettre de voir ce qu'a été envoyer dans la BDD sous forme de json///
+    ///////////////////////       Dans chaque entitée      ////////////////////////////
+
+    public function tojson(): array
+    {
+        return [
+            'id' => $this->id,
+            'username' => $this->username,
+            'firstname' => $this->firstname,
+            'lastname' => $this->naissance ? $this->naissance->format( format:'c'):null,
+            'roles' => $this->roles
+        ];
+    }
+
+
+                            FORMATER LES ERREURS 
+
+
+    public function success(string $message = 'success', array $data = null) : JsonResponse
+    {
+        return new JsonResponse([
+            'status' => 1,
+            'message' => $message,
+            'data' => $data
+        ], status:200);
+    }
+
+    public function error(string $message = 'error', int $codeHttp = 500) : JsonResponse
+    {
+        return new JsonResponse([
+            'status' => 0,
+            'message' => $message,
+        ], $codeHttp);
+    }
 
 
 ____________________________________________________________________________________________________
+
 
 
